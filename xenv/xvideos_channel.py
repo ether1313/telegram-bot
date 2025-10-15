@@ -6,7 +6,7 @@ from datetime import datetime
 from telegram import Bot
 
 # === Telegram 設定 ===
-BOT_TOKEN = "7996734575:AAFM3Me9g2dRf_kmTavIXap8TA1ZxfwVMi8"
+BOT_TOKEN = "7961665345:AAFtGJsNNqNRRntKXQCFxuCLwqGzln6hbhM"
 CHANNEL_ID = "@hottxvideos18plus"
 
 # === 影片來源連結 ===
