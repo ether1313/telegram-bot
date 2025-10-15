@@ -4,7 +4,6 @@ import time
 from bs4 import BeautifulSoup
 from datetime import datetime
 from telegram import Bot
-from telegram.request import HTTPXRequest
 
 # === Telegram 設定 ===
 BOT_TOKEN = "7996734575:AAFM3Me9g2dRf_kmTavIXap8TA1ZxfwVMi8"
@@ -30,8 +29,7 @@ CATEGORY_URLS = [
 
 VIDEOS_PER_ROUND = 10
 INTERVAL_HOURS = 2
-request = HTTPXRequest()
-bot = Bot(token=BOT_TOKEN, request=request)
+bot = Bot(token=BOT_TOKEN)
 
 
 # === 抓取單個頁面影片 ===
