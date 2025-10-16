@@ -1,13 +1,31 @@
+import os
 import requests
 import random
 import time
 from bs4 import BeautifulSoup
 from datetime import datetime
-from telegram import Bot
+from dotenv import load_dotenv
 
-# === Telegram 設定 ===
-BOT_TOKEN = "7961665345:AAFtGJsNNqNRRntKXQCFxuCLwqGzln6hbhM"
-CHANNEL_ID = "@hottxvideos18plus"
+# === 載入環境變數 ===
+load_dotenv()
+BOT_TOKEN = os.getenv("VIDEO_BOT_TOKEN")
+CHANNEL_ID = os.getenv("CHANNEL_ID")
+INTERVAL_HOURS = int(os.getenv("INTERVAL_HOURS", 2))
+
+# === Telegram HTTP 發送函數 ===
+def send_photo(chat_id, photo_url, caption):
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendPhoto"
+    data = {"chat_id": chat_id, "caption": caption, "photo": photo_url}
+    response = requests.post(url, data=data)
+    if response.status_code != 200:
+        print(f"⚠️ sendPhoto error: {response.text}")
+
+def send_message(chat_id, text):
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+    data = {"chat_id": chat_id, "text": text}
+    response = requests.post(url, data=data)
+    if response.status_code != 200:
+        print(f"⚠️ sendMessage error: {response.text}")
 
 # === 影片來源連結 ===
 CATEGORY_URLS = [
@@ -28,9 +46,6 @@ CATEGORY_URLS = [
 ]
 
 VIDEOS_PER_ROUND = 10
-INTERVAL_HOURS = 2
-bot = Bot(token=BOT_TOKEN)
-
 
 # === 抓取單個頁面影片 ===
 def fetch_from_url(url, max_videos=3):
@@ -54,7 +69,6 @@ def fetch_from_url(url, max_videos=3):
 
             video_url = "https://xhamster3.com" + href if href.startswith("/") else href
             thumbnail = img_tag.get("data-src") or img_tag.get("src") if img_tag else None
-
             videos.append({"url": video_url, "thumbnail": thumbnail})
 
         random.shuffle(videos)
@@ -63,10 +77,8 @@ def fetch_from_url(url, max_videos=3):
         print(f"⚠️ Error fetching from {url}: {e}")
         return []
 
-
 # === 抓取多個來源影片 ===
 def fetch_videos():
-    # 隨機選出 4-5 個不同來源
     selected_sources = random.sample(CATEGORY_URLS, k=5)
     print(f"🌐 Selected sources ({len(selected_sources)}):")
     for s in selected_sources:
@@ -76,13 +88,11 @@ def fetch_videos():
     for source in selected_sources:
         vids = fetch_from_url(source, max_videos=2)
         all_videos.extend(vids)
-        time.sleep(1)  # 輕微延遲防止被封
-
+        time.sleep(1)
     random.shuffle(all_videos)
     return all_videos[:VIDEOS_PER_ROUND]
 
-
-# === 發送到 Telegram 頻道 ===
+# === 發送影片到頻道 ===
 def send_to_channel():
     print(f"\n🚀 Sending videos at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     try:
@@ -90,7 +100,7 @@ def send_to_channel():
         print(f"✅ Total collected: {len(videos)} videos\n")
 
         if not videos:
-            print("⚠️ No videos found — check page structure or network.")
+            print("⚠️ No videos found — check site or network.")
             return
 
         for v in videos:
@@ -100,20 +110,15 @@ def send_to_channel():
             )
 
             if v["thumbnail"]:
-                try:
-                    bot.send_photo(chat_id=CHANNEL_ID, photo=v["thumbnail"], caption=caption)
-                except Exception as e:
-                    print(f"⚠️ Photo failed: {e}")
-                    bot.send_message(chat_id=CHANNEL_ID, text=caption)
+                send_photo(CHANNEL_ID, v["thumbnail"], caption)
             else:
-                bot.send_message(chat_id=CHANNEL_ID, text=caption)
+                send_message(CHANNEL_ID, caption)
 
             time.sleep(3)
 
         print(f"✅ Sent {len(videos)} videos successfully.")
     except Exception as e:
         print(f"⚠️ Error sending videos: {e}")
-
 
 # === 主程序循環 ===
 if __name__ == "__main__":
