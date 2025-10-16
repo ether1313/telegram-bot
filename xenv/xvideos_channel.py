@@ -3,11 +3,12 @@ import random
 import time
 from bs4 import BeautifulSoup
 from datetime import datetime
-from telegram import Bot
+import os
 
-# === Telegram 設定 ===
-BOT_TOKEN = "7961665345:AAFtGJsNNqNRRntKXQCFxuCLwqGzln6hbhM"
-CHANNEL_ID = "@hottxvideos18plus"
+# === Telegram 設定（可以從環境變數讀取，也可以直接寫死） ===
+BOT_TOKEN = os.getenv("VIDEO_BOT_TOKEN", "7961665345:AAFtGJsNNqNRRntKXQCFxuCLwqGzln6hbhM")
+CHANNEL_ID = os.getenv("CHANNEL_ID", "@hottxvideos18plus")
+INTERVAL_HOURS = int(os.getenv("INTERVAL_HOURS", 2))
 
 # === 影片來源連結 ===
 CATEGORY_URLS = [
@@ -28,8 +29,6 @@ CATEGORY_URLS = [
 ]
 
 VIDEOS_PER_ROUND = 10
-INTERVAL_HOURS = 2
-bot = Bot(token=BOT_TOKEN)
 
 
 # === 抓取單個頁面影片 ===
@@ -66,7 +65,6 @@ def fetch_from_url(url, max_videos=3):
 
 # === 抓取多個來源影片 ===
 def fetch_videos():
-    # 隨機選出 4-5 個不同來源
     selected_sources = random.sample(CATEGORY_URLS, k=5)
     print(f"🌐 Selected sources ({len(selected_sources)}):")
     for s in selected_sources:
@@ -76,10 +74,26 @@ def fetch_videos():
     for source in selected_sources:
         vids = fetch_from_url(source, max_videos=2)
         all_videos.extend(vids)
-        time.sleep(1)  # 輕微延遲防止被封
+        time.sleep(1)
 
     random.shuffle(all_videos)
     return all_videos[:VIDEOS_PER_ROUND]
+
+
+# === Telegram 同步發送函式 ===
+def send_photo(chat_id, photo_url, caption):
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendPhoto"
+    data = {"chat_id": chat_id, "photo": photo_url, "caption": caption}
+    response = requests.post(url, data=data)
+    if response.status_code != 200:
+        print(f"⚠️ sendPhoto failed: {response.text}")
+
+def send_message(chat_id, text):
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+    data = {"chat_id": chat_id, "text": text}
+    response = requests.post(url, data=data)
+    if response.status_code != 200:
+        print(f"⚠️ sendMessage failed: {response.text}")
 
 
 # === 發送到 Telegram 頻道 ===
@@ -100,13 +114,9 @@ def send_to_channel():
             )
 
             if v["thumbnail"]:
-                try:
-                    bot.send_photo(chat_id=CHANNEL_ID, photo=v["thumbnail"], caption=caption)
-                except Exception as e:
-                    print(f"⚠️ Photo failed: {e}")
-                    bot.send_message(chat_id=CHANNEL_ID, text=caption)
+                send_photo(CHANNEL_ID, v["thumbnail"], caption)
             else:
-                bot.send_message(chat_id=CHANNEL_ID, text=caption)
+                send_message(CHANNEL_ID, caption)
 
             time.sleep(3)
 
