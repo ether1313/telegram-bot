@@ -8,7 +8,7 @@ import os
 # === Telegram 設定（可以從環境變數讀取，也可以直接寫死） ===
 BOT_TOKEN = os.getenv("VIDEO_BOT_TOKEN", "7961665345:AAFtGJsNNqNRRntKXQCFxuCLwqGzln6hbhM")
 CHANNEL_ID = os.getenv("CHANNEL_ID", "@hottxvideos18plus")
-INTERVAL_HOURS = int(os.getenv("INTERVAL_HOURS", 2))
+INTERVAL_HOURS = int(os.getenv("INTERVAL_HOURS", 6))
 
 # === 影片來源連結 ===
 CATEGORY_URLS = [
