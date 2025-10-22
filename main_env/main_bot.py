@@ -12,7 +12,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
     keyboard = [
-        [InlineKeyboardButton("FREE CREDIT BONUS", url="https://t.me/addlist/PbLUCPdgcG0yZWY9")],
+        [InlineKeyboardButton("FREE CREDIT BONUS", url="https://t.me/addlist/vU9C9Dvo_TJkZThl")],
         [InlineKeyboardButton("PARTNERSHIP 13AUTEAM", url="https://www.13auteam.com/")],
         [InlineKeyboardButton("HOT VIDEOS 18+", url="https://t.me/hottxvideos18plus")]
     ]
