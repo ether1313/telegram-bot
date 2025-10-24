@@ -154,7 +154,7 @@ if __name__ == "__main__":
             script_path = os.path.join(os.path.dirname(__file__), "forward_bot", "forward_group_to_channel.py")
             subprocess.run(["python3", script_path])
         else:
-            print("⚠️ Some videos failed, skipping message forwarding this round.")
+            print("⚠️ Some videos failed, skipping message forwarding this round！")
 
         print(f"🕒 Waiting {INTERVAL_HOURS} hours before next video batch...\n")
         time.sleep(INTERVAL_HOURS * 3600)
