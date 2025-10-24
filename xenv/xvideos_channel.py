@@ -4,6 +4,8 @@ import time
 from bs4 import BeautifulSoup
 from datetime import datetime
 import os
+import subprocess
+
 
 # === Telegram 設定 ===
 BOT_TOKEN = os.getenv("VIDEO_BOT_TOKEN", "7961665345:AAFtGJsNNqNRRntKXQCFxuCLwqGzln6hbhM")
@@ -131,6 +133,11 @@ def send_to_channel():
 if __name__ == "__main__":
     print("✅ Auto Multi-Source Video Poster Started!")
     while True:
-        send_to_channel()
-        print(f"🕒 Waiting {INTERVAL_HOURS} hours before next post...\n")
+        send_to_channel()  # 发送视频
+        print("🎯 All videos sent, now starting message forward script...")
+
+        # 使用 subprocess 启动第二个脚本
+        subprocess.run(["python3", "forward_fixed_messages.py"])
+
+        print(f"🕒 Waiting {INTERVAL_HOURS} hours before next video batch...\n")
         time.sleep(INTERVAL_HOURS * 3600)
