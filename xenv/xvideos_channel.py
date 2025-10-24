@@ -150,11 +150,16 @@ if __name__ == "__main__":
 
         if all_ok:
             print("🎯 All videos sent successfully. Now starting message forward script...")
-            # 指定 forward_group_to_channel.py 的路径
-            script_path = os.path.join(os.path.dirname(__file__), "forward_bot", "forward_group_to_channel.py")
+
+            # ✅ 修正路径（跳出 xenv 再进入 forward_bot）
+            script_path = os.path.join(os.path.dirname(__file__), "..", "forward_bot", "forward_group_to_channel.py")
+            script_path = os.path.abspath(script_path)
+
+            print(f"📂 Running forward script at: {script_path}")
             subprocess.run(["python3", script_path])
         else:
             print("⚠️ Some videos failed, skipping message forwarding this round！")
+
 
         print(f"🕒 Waiting {INTERVAL_HOURS} hours before next video batch...\n")
         time.sleep(INTERVAL_HOURS * 3600)
