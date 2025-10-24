@@ -137,7 +137,7 @@ def send_to_channel():
         return success_count == len(videos)
 
     except Exception as e:
-        print(f"⚠️ Error sending videos: {e}")
+        print(f"❗ Error sending videos: {e}")
         return False
 
 
