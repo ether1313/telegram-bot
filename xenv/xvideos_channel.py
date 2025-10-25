@@ -35,9 +35,8 @@ CATEGORY_URLS = [
 ]
 
 VIDEOS_PER_ROUND = 10
+INTERVAL_HOURS = 6  # 每6小時執行一次
 
-# === 固定時間表 (澳洲時間) ===
-SCHEDULE_TIMES = ["02:00", "08:00", "14:00", "20:00"]
 
 # === 抓取影片 ===
 def fetch_from_url(url, max_videos=3):
@@ -119,51 +118,26 @@ def send_to_channel():
     return success_count == len(videos)
 
 
-# === 計算下一個時間點 ===
-def get_next_run_time():
-    now = datetime.now(AU_TZ)
-    today = now.strftime("%Y-%m-%d")
-
-    times_today = [
-        AU_TZ.localize(datetime.strptime(f"{today} {t}", "%Y-%m-%d %H:%M"))
-        for t in SCHEDULE_TIMES
-    ]
-
-    for t in times_today:
-        if now < t:
-            return t
-
-    tomorrow = (now + timedelta(days=1)).strftime("%Y-%m-%d")
-    return AU_TZ.localize(datetime.strptime(f"{tomorrow} {SCHEDULE_TIMES[0]}", "%Y-%m-%d %H:%M"))
-
-
 # === 主循環 ===
 if __name__ == "__main__":
-    print("✅ Auto Multi-Source Video Poster Started (Australia timezone mode).")
+    print("✅ Auto Multi-Source Video Poster Started (Australia timezone, every 6 hours).")
 
     while True:
-        # 檢查當前時間
         now = datetime.now(AU_TZ)
-        current_time = now.strftime("%H:%M")
+        print(f"\n🕓 Current Time (Sydney): {now.strftime('%Y-%m-%d %H:%M:%S %Z')}")
+        print("🚀 Starting new video batch...")
 
-        if current_time in SCHEDULE_TIMES:
-            print(f"🕓 It's {current_time} — time to send videos!")
-            ok = send_to_channel()
+        ok = send_to_channel()
 
-            if ok:
-                print("🎯 All videos sent successfully. Running forward script...")
-                script_path = os.path.join(os.path.dirname(__file__), "..", "forward_bot", "forward_group_to_channel.py")
-                script_path = os.path.abspath(script_path)
-                subprocess.run(["python3", script_path])
-            else:
-                print("⚠️ Some videos failed, skipping forwarding this round.")
-
-            # 等待 60 秒避免重複觸發
-            time.sleep(60)
-
+        if ok:
+            print("🎯 All videos sent successfully. Running forward script...")
+            script_path = os.path.join(os.path.dirname(__file__), "..", "forward_bot", "forward_group_to_channel.py")
+            script_path = os.path.abspath(script_path)
+            subprocess.run(["python3", script_path])
         else:
-            next_time = get_next_run_time()
-            wait_seconds = (next_time - now).total_seconds()
-            print(f"⏳ Next scheduled post at {next_time.strftime('%Y-%m-%d %H:%M %Z')} "
-                  f"(waiting {int(wait_seconds/60)} minutes)")
-            time.sleep(wait_seconds)
+            print("⚠️ Some videos failed, skipping forwarding this round.")
+
+        # 等待6小時
+        next_run = datetime.now(AU_TZ) + timedelta(hours=INTERVAL_HOURS)
+        print(f"🕒 Next batch scheduled at {next_run.strftime('%Y-%m-%d %H:%M:%S %Z')}")
+        time.sleep(INTERVAL_HOURS * 3600)

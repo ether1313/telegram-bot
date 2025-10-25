@@ -21,6 +21,7 @@ MESSAGE_GROUPS = [
 
 # === Define Australian timezone ===
 AU_TZ = pytz.timezone("Australia/Sydney")
+INTERVAL_HOURS = 6  # 每6小时运行一次
 
 bot = Bot(token=BOT_TOKEN)
 
@@ -47,30 +48,10 @@ async def forward_messages(message_ids, round_label):
     print("=" * 70)
 
 
-def get_next_run_time():
-    """Return next run time in AU timezone: 02:00, 08:00, 14:00, 20:00"""
-    now = datetime.now(AU_TZ)
-    today = now.strftime("%Y-%m-%d")
-
-    # 👇 修改這裡，原本04:00改成02:00
-    schedule_times = ["02:00", "08:00", "14:00", "20:00"]
-    times_today = [
-        AU_TZ.localize(datetime.strptime(f"{today} {t}", "%Y-%m-%d %H:%M"))
-        for t in schedule_times
-    ]
-
-    for t in times_today:
-        if now < t:
-            return t
-
-    # If all today's times passed, schedule first run for tomorrow 02:00
-    tomorrow = (now + timedelta(days=1)).strftime("%Y-%m-%d")
-    return AU_TZ.localize(datetime.strptime(f"{tomorrow} 02:00", "%Y-%m-%d %H:%M"))
-
-
 async def schedule_loop():
-    print("🤖 Bot started (Australia/Sydney timezone, runs at 02:00, 08:00, 14:00, 20:00).")
+    print("🤖 Bot started (Australia/Sydney timezone, runs every 6 hours).")
 
+    # 保存上次执行的轮次 (状态文件)
     state_file = "forward_state.txt"
     if os.path.exists(state_file):
         with open(state_file, "r") as f:
@@ -84,18 +65,16 @@ async def schedule_loop():
 
         await forward_messages(current_group, label)
 
-        # Save next round index for persistence
+        # 保存下一轮的索引
         next_index = (round_index + 1) % len(MESSAGE_GROUPS)
         with open(state_file, "w") as f:
             f.write(str(next_index))
 
-        # Schedule next run based on Australia time
-        next_time = get_next_run_time()
-        wait_seconds = (next_time - datetime.now(AU_TZ)).total_seconds()
-
-        print(f"🕒 Next batch scheduled at {next_time.strftime('%Y-%m-%d %H:%M %Z')} "
-              f"(Group {next_index + 1}) — waiting {int(wait_seconds / 60)} minutes.")
-        await asyncio.sleep(wait_seconds)
+        # 计算下一次执行时间（6小时后）
+        next_run = datetime.now(AU_TZ) + timedelta(hours=INTERVAL_HOURS)
+        print(f"🕒 Next batch scheduled at {next_run.strftime('%Y-%m-%d %H:%M:%S %Z')} "
+              f"(Group {next_index + 1}) — waiting {INTERVAL_HOURS} hours.")
+        await asyncio.sleep(INTERVAL_HOURS * 3600)
 
         round_index = next_index
 
