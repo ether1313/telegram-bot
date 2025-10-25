@@ -1,5 +1,6 @@
 import os
 import asyncio
+import pytz
 from datetime import datetime, timedelta
 from telegram import Bot
 from dotenv import load_dotenv
@@ -13,17 +14,20 @@ TARGET_CHANNEL = os.getenv("FORWARD_TARGET_CHANNEL", "@hottxvideos18plus")
 
 # === Define message groups ===
 MESSAGE_GROUPS = [
-    [47, 48, 49, 50, 51],
-    [52, 53, 54, 55, 56],
-    [57, 58, 59, 60, 61],
+    [47, 48, 49, 50, 51],   # Round 1
+    [52, 53, 54, 55, 56],   # Round 2
+    [57, 58, 59, 60, 61],   # Round 3
 ]
+
+# === Define Australian timezone ===
+AU_TZ = pytz.timezone("Australia/Sydney")
 
 bot = Bot(token=BOT_TOKEN)
 
 
 async def forward_messages(message_ids, round_label):
     print("=" * 70)
-    print(f"🕓 Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"🕓 Time: {datetime.now(AU_TZ).strftime('%Y-%m-%d %H:%M:%S %Z')}")
     print(f"🚀 Sending batch ({round_label}): {message_ids}")
     print("-" * 70)
 
@@ -35,7 +39,7 @@ async def forward_messages(message_ids, round_label):
                 message_id=msg_id
             )
             print(f"✅ Forwarded message ID: {msg_id}")
-            await asyncio.sleep(3)  # small delay between messages
+            await asyncio.sleep(3)
         except Exception as e:
             print(f"⚠️ Failed to forward {msg_id}: {e}")
 
@@ -43,10 +47,29 @@ async def forward_messages(message_ids, round_label):
     print("=" * 70)
 
 
-async def schedule_loop():
-    print("🤖 Bot started (auto 6-hour cycle mode).")
+def get_next_run_time():
+    """Return next run time in AU timezone: 04:00, 08:00, 14:00, 20:00"""
+    now = datetime.now(AU_TZ)
+    today = now.strftime("%Y-%m-%d")
 
-    # Load the last round index from file (if exists)
+    schedule_times = ["04:00", "08:00", "14:00", "20:00"]
+    times_today = [
+        AU_TZ.localize(datetime.strptime(f"{today} {t}", "%Y-%m-%d %H:%M"))
+        for t in schedule_times
+    ]
+
+    for t in times_today:
+        if now < t:
+            return t
+
+    # If all today's times passed, schedule first run for tomorrow 04:00
+    tomorrow = (now + timedelta(days=1)).strftime("%Y-%m-%d")
+    return AU_TZ.localize(datetime.strptime(f"{tomorrow} 04:00", "%Y-%m-%d %H:%M"))
+
+
+async def schedule_loop():
+    print("🤖 Bot started (Australia/Sydney timezone, every 4 scheduled times daily).")
+
     state_file = "forward_state.txt"
     if os.path.exists(state_file):
         with open(state_file, "r") as f:
@@ -65,8 +88,13 @@ async def schedule_loop():
         with open(state_file, "w") as f:
             f.write(str(next_index))
 
-        print(f"🕒 Next batch in 6 hours (will send group {next_index + 1}).")
-        await asyncio.sleep(6 * 60 * 60)  # 6 hours delay
+        # Schedule next run based on Australia time
+        next_time = get_next_run_time()
+        wait_seconds = (next_time - datetime.now(AU_TZ)).total_seconds()
+
+        print(f"🕒 Next batch scheduled at {next_time.strftime('%Y-%m-%d %H:%M %Z')} "
+              f"(Group {next_index + 1}) — waiting {int(wait_seconds / 60)} minutes.")
+        await asyncio.sleep(wait_seconds)
 
         round_index = next_index
 
