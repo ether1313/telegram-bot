@@ -29,7 +29,7 @@ async def forward_messages(message_ids, round_label):
 
     for msg_id in message_ids:
         try:
-            await bot.copy_message(
+            await bot.forward_message(
                 chat_id=TARGET_CHANNEL,
                 from_chat_id=SOURCE_GROUP_ID,
                 message_id=msg_id
