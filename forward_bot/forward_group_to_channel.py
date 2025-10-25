@@ -1,6 +1,5 @@
 import os
 import asyncio
-import pytz
 from datetime import datetime, timedelta
 from telegram import Bot
 from dotenv import load_dotenv
@@ -14,21 +13,17 @@ TARGET_CHANNEL = os.getenv("FORWARD_TARGET_CHANNEL", "@hottxvideos18plus")
 
 # === Define message groups ===
 MESSAGE_GROUPS = [
-    [47, 48, 49, 50, 51],   # Round 1
-    [52, 53, 54, 55, 56],   # Round 2
-    [57, 58, 59, 60, 61],   # Round 3
+    [47, 48, 49, 50, 51],
+    [52, 53, 54, 55, 56],
+    [57, 58, 59, 60, 61],
 ]
-
-# === Define Australian timezone ===
-AU_TZ = pytz.timezone("Australia/Sydney")
-INTERVAL_HOURS = 6  # 每6小时运行一次
 
 bot = Bot(token=BOT_TOKEN)
 
 
 async def forward_messages(message_ids, round_label):
     print("=" * 70)
-    print(f"🕓 Time: {datetime.now(AU_TZ).strftime('%Y-%m-%d %H:%M:%S %Z')}")
+    print(f"🕓 Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print(f"🚀 Sending batch ({round_label}): {message_ids}")
     print("-" * 70)
 
@@ -49,9 +44,9 @@ async def forward_messages(message_ids, round_label):
 
 
 async def schedule_loop():
-    print("🤖 Bot started (Australia/Sydney timezone, runs every 6 hours).")
+    print("🤖 Bot started (auto 6-hour cycle mode).")
 
-    # 保存上次执行的轮次 (状态文件)
+    # Load the last round index from file (if exists)
     state_file = "forward_state.txt"
     if os.path.exists(state_file):
         with open(state_file, "r") as f:
@@ -65,16 +60,13 @@ async def schedule_loop():
 
         await forward_messages(current_group, label)
 
-        # 保存下一轮的索引
+        # Save next round index for persistence
         next_index = (round_index + 1) % len(MESSAGE_GROUPS)
         with open(state_file, "w") as f:
             f.write(str(next_index))
 
-        # 计算下一次执行时间（6小时后）
-        next_run = datetime.now(AU_TZ) + timedelta(hours=INTERVAL_HOURS)
-        print(f"🕒 Next batch scheduled at {next_run.strftime('%Y-%m-%d %H:%M:%S %Z')} "
-              f"(Group {next_index + 1}) — waiting {INTERVAL_HOURS} hours.")
-        await asyncio.sleep(INTERVAL_HOURS * 3600)
+        print(f"🕒 Next batch in 6 hours (will send group {next_index + 1}).")
+        await asyncio.sleep(6 * 60 * 60)  # 6 hours delay
 
         round_index = next_index
 
