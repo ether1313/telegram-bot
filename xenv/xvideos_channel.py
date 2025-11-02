@@ -112,9 +112,10 @@ def send_videos():
     for v in videos:
         caption = (
             f"💦 <a href=\"{v['url']}\">Watch full video now</a>\n\n"
-            f"⚡ Limited Time Bonus ⚡\n"
-            f"Only for <a href=\"https://telegram.me/tpaaustralia\">TPA Telegram Group Members</a>\n"
-            f"⏰ Hurry up — once it’s gone, it’s gone!"
+            f"💎 LIMITED TIME BONUS 💎\n"
+            f"🔥 For <a href=\"https://telegram.me/tpaaustralia\">TPA Telegram Members</a> Only!\n"
+            f" ⭐⭐⭐⭐⭐ "
+            f"Officially Recommended by TPA | Join Now, Win Now"
         )
 
         if v["thumbnail"]:
