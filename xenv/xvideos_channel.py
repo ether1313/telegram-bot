@@ -10,12 +10,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 VIDEO_BOT_TOKEN = os.getenv("VIDEO_BOT_TOKEN")
-FORWARD_BOT_TOKEN = os.getenv("FORWARD_BOT_TOKEN")
 CHANNEL_ID = os.getenv("CHANNEL_ID")
-FORWARD_GROUP_ID = os.getenv("FORWARD_GROUP_ID")
-FORWARD_TARGET_CHANNEL = os.getenv("FORWARD_TARGET_CHANNEL", CHANNEL_ID)
 INTERVAL_HOURS = int(os.getenv("INTERVAL_HOURS", 6))
-FORWARD_INTERVAL_HOURS = int(os.getenv("FORWARD_INTERVAL_HOURS", 6))
 
 # === 影片來源連結 ===
 CATEGORY_URLS = [
@@ -37,13 +33,6 @@ CATEGORY_URLS = [
 ]
 
 VIDEOS_PER_ROUND = 10
-
-# === 簡單設定訊息組 ===
-MESSAGE_GROUPS = [
-    [47, 48, 49, 50, 51],
-    [52, 53, 54, 55, 56],
-    [57, 58, 59, 60, 61],
-]
 
 # === 抓取影片 ===
 def fetch_from_url(url, max_videos=3):
@@ -103,7 +92,7 @@ def fetch_videos():
     random.shuffle(all_videos)
     return all_videos[:VIDEOS_PER_ROUND]
 
-# === Telegram 發送函式 (同步 requests) ===
+# === Telegram 發送函式 ===
 def send_photo(bot_token, chat_id, photo_url, caption):
     url = f"https://api.telegram.org/bot{bot_token}/sendPhoto"
     data = {"chat_id": chat_id, "photo": photo_url, "caption": caption, "parse_mode": "HTML"}
@@ -111,15 +100,8 @@ def send_photo(bot_token, chat_id, photo_url, caption):
     if r.status_code != 200:
         print(f"⚠️ sendPhoto failed: {r.text}")
 
-def forward_message(bot_token, from_chat_id, message_id, target_chat_id):
-    url = f"https://api.telegram.org/bot{bot_token}/forwardMessage"
-    data = {"chat_id": target_chat_id, "from_chat_id": from_chat_id, "message_id": message_id}
-    r = requests.post(url, data=data)
-    if r.status_code != 200:
-        print(f"⚠️ forwardMessage failed: {r.text}")
-
 # === 主發送流程 ===
-def send_videos_and_forward():
+def send_videos():
     print(f"\n🚀 Sending videos at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     videos = fetch_videos()
 
@@ -129,8 +111,8 @@ def send_videos_and_forward():
 
     for v in videos:
         caption = (
-            f"💦 <a href=\"{v['url']}\">Click here to unlock full videos</a>\n"
-            f"🔞 <a href=\"https://tinyurl.com/3zh5zvrf\">More videos here</a>"
+            f"💦 <a href=\"{v['url']}\">Watch full video now</a>\n"
+            f"⚡ <a href=\"https://telegram.me/tpaaustralia\">Limited time bonus — only for TPA Telegram group members. Hurry up, it won’t wait!</a>"
         )
         if v["thumbnail"]:
             send_photo(VIDEO_BOT_TOKEN, CHANNEL_ID, v["thumbnail"], caption)
@@ -140,34 +122,13 @@ def send_videos_and_forward():
         time.sleep(3)
 
     print(f"✅ Sent {len(videos)} videos successfully.\n")
-    print("🎯 Starting message forwarding...")
-
-    # === 載入目前批次 ===
-    state_file = "forward_state.txt"
-    if os.path.exists(state_file):
-        with open(state_file, "r") as f:
-            round_index = int(f.read().strip())
-    else:
-        round_index = 0
-
-    current_group = MESSAGE_GROUPS[round_index]
-    print(f"🚀 Forwarding batch {round_index + 1}: {current_group}")
-    for msg_id in current_group:
-        forward_message(FORWARD_BOT_TOKEN, FORWARD_GROUP_ID, msg_id, FORWARD_TARGET_CHANNEL)
-        time.sleep(3)
-
-    next_index = (round_index + 1) % len(MESSAGE_GROUPS)
-    with open(state_file, "w") as f:
-        f.write(str(next_index))
-
-    print(f"✅ Forward batch complete. Next will be group {next_index + 1}")
 
 # === Main loop ===
 if __name__ == "__main__":
-    print("🤖 Auto Video + Forward Bot started (sync version)")
+    print("🤖 Auto Video Poster Bot started")
     while True:
         try:
-            send_videos_and_forward()
+            send_videos()
             print(f"🕒 Waiting {INTERVAL_HOURS} hours before next round...\n")
             time.sleep(INTERVAL_HOURS * 3600)
         except Exception as e:
