@@ -111,9 +111,12 @@ def send_videos():
 
     for v in videos:
         caption = (
-            f"💦 <a href=\"{v['url']}\">Watch full video now</a>\n"
-            f"⚡ <a href=\"https://telegram.me/tpaaustralia\">Limited time bonus — only for TPA Telegram group members. Hurry up, it won’t wait!</a>"
+            f"💦 <a href=\"{v['url']}\">Watch full video now</a>\n\n"
+            f"⚡ Limited Time Bonus ⚡\n"
+            f"Only for <a href=\"https://telegram.me/tpaaustralia\">TPA Telegram Group Members</a>\n"
+            f"⏰ Hurry up — once it’s gone, it’s gone!"
         )
+
         if v["thumbnail"]:
             send_photo(VIDEO_BOT_TOKEN, CHANNEL_ID, v["thumbnail"], caption)
         else:
