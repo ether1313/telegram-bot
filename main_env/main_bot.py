@@ -5,10 +5,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     photo_path = "main_env/images/girl-03.jpeg"
 
     caption = (
-        "Hey there! 😘\n"
-        "If you're not a robot, tap the buttons below 👇\n"
-        "Help this babe grow her channel 💋\n\n"
-        "Daily bonus rain and lucky spins are waiting for you 🎁🎰"
+        "😘 Hey there! \n"
+        "👇 If you're not a robot, tap the buttons below \n"
+        "💋 Help this babe grow her channel \n\n"
+        "🎁 Daily bonus rain and lucky spins are waiting for you 🎰"
     )
 
     keyboard = [
