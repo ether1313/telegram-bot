@@ -114,7 +114,7 @@ def send_videos():
             f"💦 <a href=\"{v['url']}\">Watch full video now</a> \n\n"
             f"⏳ LIMITED TIME BONUS ⏳ \n"
             f"🔥 For <a href=\"https://telegram.me/tpaaustralia\">TPA Telegram Members</a> Only❗ \n\n"
-            f"⫘⫘⫘⫘⫘⫘⫘⫘⫘⫘⫘⫘⫘⫘⫘\n"
+            f"⫘⫘⫘⫘⫘⫘⫘⫘⫘⫘⫘⫘\n"
             f"|🇦🇺 Officially Recommended by TPA 🇦🇺| \n"
             f"🚀 Join Now, Win Now 🚀"
         )
