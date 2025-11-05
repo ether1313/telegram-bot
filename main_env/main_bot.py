@@ -7,14 +7,14 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
     caption = (
-        f"Welcome {user_name}, hey there! 👋\n\n"
+        f"👋 Welcome {user_name}, \n\n"
         "Before we start, if you're not a robot \n" 
-        "Pls tap the both buttons [I'M NOT A ROBOT] \n" 
-        "to get the bonus rewards 🎁 \n\n"
+        "Kindly tap the both buttons [I'M NOT A ROBOT] \n" 
+        "to get unlimited bonus rewards 🎁 \n\n"
         "Earn Affiliate Commission Cash \n"
         "Share More, Earn More 💰 \n\n"
-        "Earn Cash Win More With This Sexy Vibes 💦 \n"
-        "Click [CHAT WITH HER]"
+        "Win More With This Sexy Vibes \n"
+        "Tap [CHAT WITH HER] ▶︎ •၊၊||၊|။|| 0:10"
     )
 
     keyboard = [
