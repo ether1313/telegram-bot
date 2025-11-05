@@ -10,12 +10,12 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"👋 Welcome {user_name}, \n\n"
         "Before we start, if you're not a robot \n" 
         "Kindly tap the both buttons \n" 
-        "【I'M NOT A ROBOT 🟢T】 \n" 
+        "'I'M NOT A ROBOT 🟢' \n" 
         "to get unlimited bonus rewards 🎁 \n\n"
         "Earn Affiliate Commission Cash \n"
         "Share More, Earn More 💰 \n\n"
         "Win More With This Sexy Vibes \n"
-        "Try tap [CHAT WITH HER] ▶︎ •၊၊||၊|။|| 0:10"
+        "Try tap 'CHAT WITH HER ﾒ૦ﾒ૦💋' ▶︎ •၊၊||၊|။|| 0:10"
     )
 
     keyboard = [
