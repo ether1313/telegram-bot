@@ -3,18 +3,24 @@ from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     photo_path = "main_env/images/girl-03.jpeg"
+    user_name = update.effective_user.first_name or update.effective_user.username or "there"
+
 
     caption = (
-        "😘 Hey there! \n"
-        "👇 If you're not a robot, tap the buttons below \n"
-        "💋 Help this babe grow her channel \n\n"
-        "🎁 Daily bonus rain and lucky spins are waiting for you 🎰"
+        f"Welcome {user_name}, hey there! 👋\n\n"
+        "Welcome, hey there! \n\n"
+        "Before we start, if you're not a robot \n" 
+        "tap the both buttons [I'M NOT A ROBOT] to get bonus rewards 🎁 \n\n"
+        "Earn Affiliate Commission Cash \n"
+        "Share More, Earn More 💰 \n\n"
+        "Earn Cash Win More With This Sexy Vibes 💦 \n"
+        "Click [CHAT WITH HER]"
     )
 
     keyboard = [
-        [InlineKeyboardButton("FREE CREDIT BONUS", url="https://t.me/addlist/vU9C9Dvo_TJkZThl")],
-        [InlineKeyboardButton("PARTNERSHIP 13AUTEAM", url="https://www.13auteam.com/")],
-        [InlineKeyboardButton("HOT VIDEOS 18+", url="https://t.me/hottxvideos18plus")]
+        [InlineKeyboardButton("I'M NOT A ROBOT 🟢", url="https://t.me/addlist/vU9C9Dvo_TJkZThl")],
+        [InlineKeyboardButton("I'M NOT A ROBOT 🟢", url="https://www.13auteam.com/")],
+        [InlineKeyboardButton("CHAT WITH HER 💗⃝🌕", url="https://t.me/hottxvideos18plus")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
